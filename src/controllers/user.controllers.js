@@ -14,11 +14,10 @@ const create = catchError(async(req, res) =>{
   return res.status(201).json(user)
 });
 
-const get = catchError(async(req, res) =>{
+const getOne = catchError(async(req, res) =>{
   const { id } = req.params;
-  const user = await User.findAll({
-    where: {id: id}
-  });
+  const user = await User.findByPk(id);
+  if (!user) return res.status(404).json({ message: "User not found" })
   return res.json(user);
 });
 
@@ -34,14 +33,15 @@ const update = catchError(async(req, res) => {
   const user = await User.update(
     { first_name, last_name, email, password, birthday },
     { where: { id }, returning: true }
-  );
-  return res.json(user);
+  )
+  if (country[0] === 0) return res.status(404).json({ message: "user not found"})
+  return res.json(user[1][0]);
 });
 
 module.exports = {
     getAll,
     create,
-    get,
+    getOne,
     remove,
     update
 }
